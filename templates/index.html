@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>File Server</title>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/fontawesome.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/solid.css') }}"/>
+  </head>
+  <body>
+  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container-fluid">
+        {% if cdir and not back %}
+        <a class="navbar-brand" href="{{ url_for('upload_file') }}"><i class="fa-solid fa-arrow-left"></i></a>
+        {% endif %}
+        {% if cdir and back %}
+        <a class="navbar-brand" href="{{ url_for('upload_file', cdir=back+'/') }}"><i class="fa-solid fa-arrow-left"></i></a>
+        {% endif %}
+        <a class="navbar-brand" href=#>
+
+            <i class="fa-solid fa-folder-open"></i>
+            /{{ cdir }}
+        </a>
+        <li class="nav-item"  style="color: #FFFFFF">
+            Espacio: {{ taken }} / {{ totalgb }} 
+        </li>
+        <form class="d-flex" method=post>
+            <input class="form-control me-sm-2" name=new_folder placeholder="Crear carpeta">
+            <button class="btn btn-secondary my-2 my-sm-0" type="submit" value=new_folder>+</button>
+        </form>
+    </div>
+  </nav>
+  <table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tamaño</th>
+            <th scope="col">Ultima modificación</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for folder in folders %}
+        <tr class="table-active">
+            <th scope="row">
+                <i class="fa-solid fa-folder" style="color: #2C3E50"></i>
+                <a href="{{ url_for('upload_file', cdir=cdir+folder+'/') }}" style="color: #2C3E50"> {{ folder }} </a>
+            </th>
+            <td></td>
+            <td></td>
+            <td >
+                <a class="badge bg-danger" onclick="return confirmAction()" href="{{ url_for('delete', name=cdir+folder+'/') }}">x</a>
+            </td>
+        </tr>
+    {% endfor %}
+    {% for file in files %}
+        <tr class="table-active">
+            <th scope="row">
+                <i class="fa-solid fa-file" style="color: #18BC9C"></i>
+                <a href="{{ url_for('download_file', name=cdir+file['name']) }}">{{ file['name'] }} </a>
+            </th>
+            <td>{{ file['size'] }}</td>
+            <td>{{ file['last_mod'] }}</td>
+            <td >
+                <a class="badge bg-danger" onclick="return confirmAction()" href="{{ url_for('delete', name=cdir+file['name']) }}">x</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+    <form method=post enctype=multipart/form-data> 
+      <label for="formFile" class="form-label mt-4">Elegir archivo</label>
+      <input class="form-control" type=file name=file>
+      <br>
+      <input type=submit class="btn btn-primary" value=Subir>
+    </form>
+    <script>
+    function confirmAction() {
+        if (window.confirm("¿Está seguro de realizar esta acción?")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    </script>
+  </body>
+</html>
+
